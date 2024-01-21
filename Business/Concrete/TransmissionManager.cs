@@ -1,40 +1,30 @@
 ﻿using AutoMapper;
 using Business.Abstract;
 using Business.BusinessRules;
-using Business.Requests.Transmission;
-using Business.Responses.Fuel;
+using Business.Request.Transmission;
 using Business.Responses.Transmission;
 using DataAccess.Abstract;
-using DataAccess.Concrete.EntityFramework;
 using Entities.Concrete;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business.Concrete
 {
     public class TransmissionManager : ITransmissionService
     {
         private readonly ITransmissionDal _transmissionDal;
-        private readonly TransmissionBusinnesRules _transmissionBusinnesRules;
-        private readonly IMapper _mapper;
-
-        public TransmissionManager(ITransmissionDal transmissionDal, TransmissionBusinnesRules transmissionBusinnesRules, IMapper mapper)
+        private readonly TransmissionBusinessRules _transmissionBusinessRules;
+        private IMapper _mapper;
+        public TransmissionManager(ITransmissionDal transmissionDal, TransmissionBusinessRules transmissionBusinessRules, IMapper mapper)
         {
-            _transmissionDal = transmissionDal; 
-            _transmissionBusinnesRules = transmissionBusinnesRules;
+            _transmissionDal = transmissionDal;
+            _transmissionBusinessRules = transmissionBusinessRules;
             _mapper = mapper;
         }
 
-
         public AddTransmissionResponse Add(AddTransmissionRequest request)
         {
-            _transmissionBusinnesRules.CheckIfTransmissionNameNotExists(request.TransmissionName);
+            _transmissionBusinessRules.CheckIfTransmissionNameExists(request.Name);
 
-           
-            Transmission transmissionToAdd = _mapper.Map<Transmission>(request.TransmissionName); // Mapping
+            Transmission transmissionToAdd = _mapper.Map<Transmission>(request);
 
             _transmissionDal.Add(transmissionToAdd);
 
@@ -42,11 +32,13 @@ namespace Business.Concrete
             return response;
         }
 
-       
-        public IList<Transmission> GetList()
+
+        public GetTransmissionListResponse GetList(GetTransmissionListRequest request)
         {
-            IList<Transmission> transmissionsList = _transmissionDal.GetList();
-            return transmissionsList;
+            IList<Transmission> transmissionList = _transmissionDal.GetList();
+            GetTransmissionListResponse response = _mapper.Map<GetTransmissionListResponse>(transmissionList);
+            return response;
+
         }
     }
 }

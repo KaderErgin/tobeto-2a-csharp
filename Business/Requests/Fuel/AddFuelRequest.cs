@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Business.Requests.Fuel
+﻿namespace Business.Request.Fuel
 {
     public class AddFuelRequest
     {
-        public string FuelName { get; set; }
-
+        // ekleme yap
+        public string Name { get; set; }
         public AddFuelRequest(string name)
         {
-            FuelName = name;
+            Name = name;
         }
     }
 }

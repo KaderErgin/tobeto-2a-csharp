@@ -1,14 +1,9 @@
 ﻿using DataAccess.Abstract;
 using Entities.Concrete;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess.Concrete.EntityFramework
 {
-    public class EfTransmissionDal : ITransmissionDal
+    public class ETransmissionDal : ITransmissionDal
     {
         public void Add(Transmission entity)
         {
@@ -16,6 +11,11 @@ namespace DataAccess.Concrete.EntityFramework
         }
 
         public void Delete(Transmission entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList<Transmission> GetTransmissionsByNameSearch(string nameSearch)
         {
             throw new NotImplementedException();
         }

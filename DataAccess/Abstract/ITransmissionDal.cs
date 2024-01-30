@@ -5,7 +5,5 @@ namespace DataAccess.Abstract
 {
     public interface ITransmissionDal : IEntityRepository<Transmission, int>
     {
-
-
     }
 }

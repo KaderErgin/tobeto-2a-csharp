@@ -1,9 +1,13 @@
-﻿using Business.Request.Car;
+﻿using Business.Requests.Car;
 using Business.Responses.Car;
-namespace Business.Abstract;
 
-public interface ICarService
+namespace Business.Abstract
 {
-    public AddCarResponse Add(AddCarRequest request);
-    public GetCarListResponse GetList(GetCarListRequest request);
+    public interface ICarService
+    {
+        public AddCarResponse Add(AddCarRequest request);
+        public UpdateCarResponse Update(UpdateCarRequest request);
+        public DeleteCarResponse Delete(DeleteCarRequest request);
+        public GetCarListResponse GetList(GetCarListRequest request);
+    }
 }

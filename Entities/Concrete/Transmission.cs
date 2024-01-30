@@ -2,11 +2,9 @@
 
 namespace Entities.Concrete
 {
-
     public class Transmission : Entity<int>
     {
-
-        public string Name { get; set; } = null!;
+        public string Name { get; set; }
         public Transmission()
         {
 

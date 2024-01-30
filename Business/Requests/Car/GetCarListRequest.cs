@@ -1,4 +1,4 @@
-﻿namespace Business
+﻿namespace Business.Requests.Car
 {
     public class GetCarListRequest
     {

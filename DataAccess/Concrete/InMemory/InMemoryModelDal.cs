@@ -2,14 +2,13 @@
 using DataAccess.Abstract;
 using Entities.Concrete;
 
-namespace DataAccess.Concrete.InMemory
+namespace DataAccess.Concrete.InMemory;
+
+public class InMemoryModelDal : InMemoryEntityRepositoryBase<Model, int>, IModelDal
 {
-    public class InMemoryModelDal : InMemoryEntityRepositoryBase<Model, int>, IModelDal
+    protected override int generateId()
     {
-        protected override int generateId()
-        {
-            int nextId = _entities.Count == 0 ? 1 : _entities.Max(e => e.Id) + 1;
-            return nextId;
-        }
+        int nextId = Entities.Count == 0 ? 1 : Entities.Max(e => e.Id) + 1;
+        return nextId;
     }
 }

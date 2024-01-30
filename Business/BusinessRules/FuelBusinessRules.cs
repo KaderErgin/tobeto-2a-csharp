@@ -1,4 +1,6 @@
-﻿using DataAccess.Abstract;
+﻿using Core.CrossCuttingConcerns.Exceptions;
+using DataAccess.Abstract;
+using Entities.Concrete;
 
 namespace Business.BusinessRules
 {
@@ -10,7 +12,7 @@ namespace Business.BusinessRules
         {
             _fuelDal = fuelDal;
         }
-
+        //verilen (fuel) adının  veritabanında mevcut olup olmadığını kontrol et
         public void CheckIfFuelNameExists(string fuelName)
         {
             bool isExists = _fuelDal.GetList().Any(f => f.Name == fuelName);
@@ -20,6 +22,21 @@ namespace Business.BusinessRules
             }
 
         }
-
+        //id değerine sahip (fuel) kaydının bulunup bulunmadığı kontrol et
+        public Fuel FindFuelId(int id)
+        {
+            Fuel fuel = _fuelDal.GetList().SingleOrDefault(b => b.Id == id);
+            return fuel;
+        }
+        //fuel nesnesinin null olup olmadoğını kontrol et
+        public void CheckIfFuelExists(Fuel? fuel)
+        {
+            if (fuel is null)
+                throw new NotFoundException("Fuel not found.");
+        }
     }
+
+
+
+
 }

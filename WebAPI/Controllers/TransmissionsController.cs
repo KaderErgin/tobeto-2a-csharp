@@ -1,9 +1,7 @@
-﻿using Business;
-using Business.Abstract;
-using Business.Request.Transmission;
+﻿using Business.Abstract;
+using Business.Requests.Transmission;
 using Business.Responses.Transmission;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace WebAPI.Controllers
 {
@@ -11,66 +9,53 @@ namespace WebAPI.Controllers
     [ApiController]
     public class TransmissionsController : ControllerBase
     {
-        private readonly ITransmissionService _transmissionService;
-
-        public TransmissionsController(ITransmissionService transmissionService)
+        public readonly ITransmissionService _transmissionService;
+        public TransmissionsController(ITransmissionService service)
         {
-            _transmissionService = transmissionService;
+            _transmissionService = service;
         }
-
         [HttpGet]
-     /*   public ActionResult<GetTransmissionListResponse> GetList()
-        {
-            GetTransmissionListResponse response = _transmissionService.GetList(new GetTransmissionListRequest());
-            return Ok(response);
-        }*/
-        public GetTransmissionListResponse GetList([FromQuery] GetTransmissionListRequest request)// Referans tipleri varsayılan request body'den alır.
+        public GetTransmissionListResponse GetList([FromQuery] GetTransmissionListRequest request)
         {
             GetTransmissionListResponse response = _transmissionService.GetList(request);
-            return response; //JSON
+            return response;
+
         }
         [HttpPost]
         public ActionResult<AddTransmissionResponse> Add(AddTransmissionRequest request)
         {
-            AddTransmissionResponse response = _transmissionService.Add(request);
-            return CreatedAtAction(nameof(GetList), response);
+            try
+            {
+                AddTransmissionResponse response = _transmissionService.Add(request);
+
+                return CreatedAtAction(nameof(GetList), response);
+            }
+            catch (Core.CrossCuttingConcerns.Exceptions.BusinessException exception)
+            {
+                return BadRequest(new Core.CrossCuttingConcerns.Exceptions.BusinessProblemDetails()
+                {
+                    Title = "Business Exceptions",
+                    Status = StatusCodes.Status400BadRequest,
+                    Detail = exception.Message,
+                    Instance = HttpContext.Request.Path
+
+                });
+            }
+       
+        }
+        [HttpPut("{id}")]
+        public ActionResult<UpdateTransmissionResponse> Update([FromRoute] int Id, [FromBody] UpdateTransmissionRequest request)
+        {
+            if (Id != request.Id)
+                return BadRequest();
+            UpdateTransmissionResponse response = _transmissionService.Update(request);
+            return Ok(response);
+        }
+        [HttpDelete("{id}")]
+        public DeleteTransmissionResponse Delete([FromRoute] DeleteTransmissionRequest request)
+        {
+            DeleteTransmissionResponse delete = _transmissionService.Delete(request);
+            return delete;
         }
     }
 }
-
-//using Business;
-//using Business.Abstract;
-//using Business.Request.Transmission;
-//using Business.Responses.Transmission;
-//using Entities.Concrete;
-//using Microsoft.AspNetCore.Mvc;
-
-//namespace WebAPI.Controllers
-//{
-//    [Route("api/[controller]")]
-//    [ApiController]
-//    public class TransmissionsController : ControllerBase
-//    {
-//        private readonly ITransmissionService _transmissionService;
-
-//        public TransmissionsController(ITransmissionService transmissionService)
-//        {
-//            _transmissionService = transmissionService;
-//        }
-
-//        [HttpGet]
-//        public ActionResult<GetTransmissionListResponse> GetList()
-//        {
-//            GetTransmissionListResponse response = _transmissionService.GetList(new GetTransmissionListRequest());
-//            return Ok(response);
-//        }
-
-//        [HttpPost]
-//        public ActionResult<AddTransmissionResponse> Add(AddTransmissionRequest request)
-//        {
-//            AddTransmissionResponse response = _transmissionService.Add(request);
-//            // 200 OK
-//            return CreatedAtAction("GetList", response); // 201 Created 
-//        }
-//    }
-//}

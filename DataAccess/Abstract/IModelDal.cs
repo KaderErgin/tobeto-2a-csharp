@@ -1,12 +1,8 @@
 ﻿using Core.DataAccess;
 using Entities.Concrete;
 
-namespace DataAccess.Abstract
+namespace DataAccess.Abstract;
+
+public interface IModelDal : IEntityRepository<Model, int>
 {
-    public interface IModelDal : IEntityRepository<Model, int>
-    {
-
-     
-    }
 }
-

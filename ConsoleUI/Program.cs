@@ -1,223 +1,281 @@
-﻿#region Degiskenler // metinsel ifade yazılabilir, yazılmayadabilir
-// Değişkenler
-// Type safety , tip güvenli
-//bellekte kaplayacağı alanı önceden ayırmış oluyoruz hem de alabileceği değerleri ve aralığını belirlemiş oluyoruz.
-
-//string karsilama = "Hellooo World!";
-// var deneme = 3546; var yazdığımızda ide karşıdaki değerin ne olduğunu bilip ona göre değişkeni ifade ediyo
-
-// var yil=2023; Derlemede aşamasında veri tipini kendisi belirliyor
-
-//İLKEL TİP 
-// int yil = 2023; tam sayı 32-bit int.MaxValue ( int. max değeri) ~2.1 milyar (- , +)
-//short yil = 2023; 16-bit ~32 bin (- , +)
-//ushort yil = 2023; // unsigned - değerleri yok 16bit 0 ila ~+65bin arasında
-
-//Console.WriteLine(yil);
-
-//byte yas = 25; //0-255 arasında
-////long hesaplamaSonucu = long.MaxValue; 64-bit sonucun çok büyük çıkacağı hesaplamalarda kullanılır unsigned türü de var
-
-//float dolarKuru = 29.06f; // 32 bit 
-//double dolarKuru2 = 29.0655865478; //64 bit ondalık kısmı daha fazla tutulabiliyor,
-//decimal dolarKuruDecimal = 9.02451285265m; // 128 bit hassas verilerde, hesaplama sonucunda ondalık kısmı daha çok oluyor
-//bool dogruMu = true;// 1-bit, en küçük sayı için en küçük yer alan kaplıyor. 2 değer alır true ya da false, default:false
-//char karakter = 'A'; //65 sayısına denk geliyor, ASCII tablosuna göre 16-bit yer kaplıyor default: 0 unicode ASCII U+0000(null)
-
-////string aslında bir REFERANS TİP, ilkel/değer tip  metinsel ifadeye göre bellekteki yeri değişiyor
-//string isim = "Ahmet"; //32-bit // 16 milyar bite kadar genişleyebiliyor, default:null
-////tüm referans tiplerin defaultu nulldur. 
-//int sayi2 = default; //0
-//Console.WriteLine(sayi2);
-
-//string? takmaAd = null; // bu değişkenin string ya da null olabileceğini söylüypr
-//if (takmaAd != null)
-//    Console.WriteLine(takmaAd.ToUpper());
-//Console.WriteLine(takmaAd?.ToUpper()); // takmaAd eğer null ise toupper metotunu çalıştırmayacak, direkt null verecek
-
-//Console.WriteLine(takmaAd ?? "takma ismi bulunmuyor"); //takmaad null ise sağdaki değeri bize verecek
-
-//bool durum1 = true;
-//bool durum2 = false;
-//bool sonucDurum = durum1 && durum2; // false;
-//bool sonucDurum2 = durum1 || durum2; //true
-
-//int tamSayi = 10;
-//double ondalikliSayi = tamSayi; // 10.0 Implisit (bilinçsiz) tür dönüşümü
-
-//double ondalikliSayi2 = 10.5;
-//// int tamSayi2 =ondalikliSayi2; // veri kaybı olacağı için implist şekilde dönüşüm yapmayacaktır.
-//int tamSayi2 = (int)ondalikliSayi2; // casting (parantez içinde dönüştürme işlemi) Explist (bilinçli) tür dönüşümü
-//Console.WriteLine(tamSayi2);
-
-////Console.WriteLine(ondalikliSayi);
-
-//long buyukTamSayi = long.MaxValue; //64-bit
-//int normalTamSayi = (int)buyukTamSayi; // 64-bit -> 32-bit // Hata: -1 döndürür
-
-////Daha güvenli tür dönüüşüm işlemleri için:
-////int normalTamSayi2 = Convert.ToInt32(buyukTamSayi); // error: değer int'e göre çok büyük
-
-//string metinselTamSayi=buyukTamSayi.ToString();
-////double 2OndalikSayi //Invalid
-//double ondalik_sayi = long.MaxValue; // Valid
-//// double double =double.MaxValue; double bir keyword olduğu için değişken ismi olarak kullanamayız
-//double @double = double.MaxValue;
-
-//long cokBuyukTamSayi = long.MaxValue;
-//Console.WriteLine(cokBuyukTamSayi+1);//sayımız ilgili veri tipinin MinValue değerine geri döner
-
-#endregion // süslü parantez gibi o kısmı ayrı bir bölüm yapıyor. 
-#region KosulluIfade
-
-using ConsoleUI;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Immutable;
 using System.Text;
+using System.Text.Json.Serialization;
+using Business.Abstract;
+using Business.Concrete;
+using ConsoleUI;
+using DataAccess.Abstract;
+using DataAccess.Concrete.InMemory;
+using Entities.Concrete;
+
+#region Değişkenler
+// var yil = 2023; // Derlemede aşamasında veri tipini kendisi belirliyor
+
+// Type safety, tip güvenli
+// Bellekte kaplacayacağı alanı önceden ayırmış oluyoruz hem de, alabileceği değerleri ve aralığını belirlemiş oluyoruz.
+
+// İlkel/Değer tip
+//int yil = 2023; // 32-bit ~-2.1mr - ~2.1mr // default değeri: 0 (ondalik) // 00000000 (ikilik)
+//short yil = 2023; // 16-bit ~-32bin - ~32bin // default: 0
+
+ushort yil = 2023; // unsigned // 16-bit 0 - ~65bin // default: 0
+
+byte yas = 25; // 0-255 // default: 0
+long hesaplamaTamSayiSonucu = 9999999999999; // 64-bit // default: 0
+
+//float dolarKuru = 29.06f; // 32-bit // default: 0.0
+double dolarKuru = 29.06593; // 64-bit // default: 0.0
+decimal hesaplamaSonucu = 29.06592312931290312903m; // 128-bit // default: 0.0
+
+bool girisYaptiMi = true; // 1-bit // default: false
+
+char karakter = 'A'; // 65 // Ek bilgi: Unicode ASCII tablolarına göre 65 // 16-bit // default: 0 // Unicode ASCII U+0000 (NULL)
+
+// String aslında bir referans tip, İlkel/Değer tip
+string isim = "Ahmet"; // 32-bit // 16mr-bit'e kadar genişleyebiliyor // default: null
+
+string? takmaAd = null;
+
+//if (takmaAd != null)
+//    Console.WriteLine(takmaAd.ToUpper()); // takmaAd null ise ToUpper metodunu çalıştırmaya çalışmayacak ve null değerini bize verecek.
+
+//Console.WriteLine(takmaAd?.ToUpper()); // takmaAd null ise ToUpper metodunu çalıştırmaya çalışmayacak ve null değerini bize verecek.
+
+//Console.WriteLine(takmaAd ?? "Takma ismi bulunmuyor"); // takmaAd null ise sağdaki değeri bize verecek.
+
+// ek bilgi: DRY - Do not Repeat Yourself
+// ek bilgi: mccall software quality model
+
+int sayi1 = 10;
+int sayi2 = 20;
+int sayi3 = 30;
+int sayiSonuc = sayi1 + sayi2 * sayi3;
+
+string isim2 = "Ahmet";
+string soyad = "Çetinkaya";
+string tamIsim = isim2 + " " + soyad;
+
+bool durum1 = true;
+bool durum2 = false;
+bool sonucDurum = durum1 && durum2; // false
+bool sonucDurum2 = durum1 || durum2; // true
+
+int tamSayi = 10;
+double ondalikLiSayi = tamSayi; // 10.0 // Implisit (biliçsiz) tür dönüşümü
+
+double ondalikliSayi2 = 10.5;
+
+//int tamSayi2 = ondalikliSayi2; // Veri kaybı olacağı için implist şekilde tür dönüşümü yapmayacaktır
+int tamSayi2 = (int)ondalikliSayi2; // Casting // Explist (bilinçli) tür dönüşümü
+
+long buyukTamSayi = long.MaxValue; // 64-bit
+int normalTamSayi = (int)buyukTamSayi; // 64-bit -> 32-bit // Hata: -1
+
+// Daha güvenli tür dönüşüm işlemleri için:
+//int normalTamSayi2 = Convert.ToInt32(buyukTamSayi); // Error: değer int'e göre çok büyük
+string metinselTamSayi = buyukTamSayi.ToString();
+
+//double 2OndalıkSayı // Invalid
+double ondalik_sayi = long.MaxValue; // Valid
+
+//double double = double.MaxValue;
+double @double = double.MaxValue;
+
+//double ondalik sayi = long.MaxValue; // Invalid
+
+//long cokBuyukTamsayi = long.MaxValue + 1; // Overflow error
+
+long cokBuyukTamsayi = long.MaxValue;
+//Console.WriteLine(cokBuyukTamsayi + 1); // Sayımız ilgili veri tipinin MinValue değerine geri döner.
+
+#endregion
+
+#region Koşullu ifade
 
 bool durum3 = false;
 bool durum4 = true;
 
 //if (durum3)
-//    Console.WriteLine("Durum 3 geçerli"); // tek satırlık kod yazıldığında scope açmadan da yazılabilir
+//    Console.WriteLine("Durum 3 Geçerli");
+
 //if (durum3)
-//{ //scope
-//    Console.WriteLine("Durum 3 geçerli");
-//} //scope
+//{
+//    Console.WriteLine("Durum 3 Geçerli");
+//}
 //else if (durum4)
-//    Console.WriteLine("durum 4 geçerli");
+//{
+//    Console.WriteLine("Durum 4 Geçerli");
+//}
 //else
 //{
-//    Console.WriteLine("durumlar geçersiz");
+//    Console.WriteLine("Durumlar Geçersiz");
 //}
 
 string komut = "delete";
+
+//if (komut == "add" || komut == "update")
+//    Console.WriteLine("Ekleme işlemi tamamlandı");
+//else if (komut == "delete")
+//    Console.WriteLine("Silme işlemi tamamlandı");
+
 //switch (komut)
 //{
 //    case "add":
-//    case "update": // add ya da update ise ||
-//        Console.WriteLine("ekleme işlemi tamamlandı");
+//    case "update":
+//        Console.WriteLine("Ekleme işlemi tamamlandı");
 //        break;
+
 //    case "delete":
-//        Console.WriteLine("silme işlemi tamamlandı");
+//        Console.WriteLine("Silme işlemi tamamlandı");
 //        break;
+
 //    default:
-//        Console.WriteLine("geçersiz işlem");
+//        Console.WriteLine("Geçersiz işlem.");
 //        break;
 //}
-string mesaj; //default null
+
+
+string mesaj; // default: null
+
 if (komut == "add" || komut == "update")
-    mesaj = "Ekleme işlemi tamalandı";
+    mesaj = "Ekleme işlemi tamamlandı";
 else if (komut == "delete")
     mesaj = "Silme işlemi tamamlandı";
 
-mesaj = komut == "add" ? "Ekleme işlemi tamamlandı"  // ternary operator
-    : komut == "delete" ? "silme işlemi tamamlandı"
-    : "geçersiz işlem";
+mesaj =
+    komut == "add"
+        ? "Ekleme işlemi tamamlandı" // ternary opreator
+        : komut == "delete"
+            ? "Silme işlemi tamamlandı"
+            : "Geçersiz işlem";
+
 mesaj = komut switch
 {
-    "add" => "ekleme işlemi tamamlandı",
+    "add" => "Ekleme işlemi tamamlandı",
     "delete" => "Silme işlemi tamamlandı",
     _ => "Geçersiz işlem"
 };
 
+//Console.WriteLine(mesaj);
+
 #endregion
 
-#region Donguler
+#region Döngüler
 
-//int sayi4 = 10;
-//int sayi5 = sayi4++;
-//int birArttir(int sayi)
-//{
-//    int temp = sayi;
-//    sayi = sayi + 1;
-//    return temp;
-//}
-//int onceBirArttir (int sayi)
-//{
-//    sayi= sayi + 1;
-//    return sayi;
-//}
+int sayi4 = 10;
+int sayi5 = sayi4++;
+int birArttir(int sayi)
+{
+    int temp = sayi;
+    sayi = sayi + 1;
+    return temp;
+}
+int sayi6 = ++sayi4;
+int onceBirArttir(int sayi)
+{
+    sayi = sayi + 1;
+    return sayi;
+}
 
-for (int index = 0; //Döngünün en başında bir kere çalışan komutumuz
-    index < 10;// Her döngünün başında kontrol ettiğimiz komut)
-    ++index //index++ // index = index+1 // index+=2 // her döngünün sonunda çalışan atama komutumuz
-    )
+//int sayi6 = ++sayi4;
+//Console.WriteLine(sayi6);
+
+for (
+    int index = 0; // Döngünün en başında bir kere çalışan komutumuz
+    index < 10; // Her döngünün başında kontrol ettiğimiz koşul
+        ++index // index++ // index = index + 1 // index += 1 // Her döngünün sonunda çalışan atama komutuz
+)
 {
     if (index == 5)
-        continue; // döngü 5deyken console yazdırmayacak, bir sonraki adıma geçecek
+        continue; // Bu döngü adımına devam etmeden bir sonraki döngü admına geçer
 
     if (index == 7)
-        break; // direkt döngüden çıkacak
+        break; // Döngü sürecini tamamen bitirir
+
+    //for (int i = 0; i < 10; ++i)
+    //{ if (i == 0) continue;}
+
     //Console.WriteLine(index);
 }
+
 int index2 = 0;
 while (index2 < 10)
 {
-    // if (index2 == 5) continue; //sonsuz döngü oluşturmuş oluyoruz.
+    //if (index2 == 5) continue; // Sonsuz döngü oluşturmuş oluruz
     if (index2 == 5)
     {
         index2 += 1;
         continue;
     }
 
-    if (index2 == 7) break;
+    if (index2 == 7)
+        break;
+
     //Console.WriteLine(index2);
 
     index2 += 1;
 }
-//int index = 10;
-//while(index<10)
-//{
-//    ++index;
-//}
 
-//while(true)//her döngünün başında kontrol ettiğimiz kısım 
-//sonsuz döngülerden her daim kaçınmamız gerekiyor, çünkü pragram o noktada tıkanacaktır
+//while (true // Her döngünün başında kontrol ettiğimiz koşul
+//) // Sonsuz döngülerden her daim kaçınmamız gerekiyor, çünkü program o noktada tıkanacaktır
 //{
-//    //istisne durumlarda sürekli kontrol için sonsuz döngüler oluşturulabilir. fakat programı aksatmayacak ayrı bir işlem parçacığına gerek olur
+//    // İstisna durumlarda sürekli kontrol için sonsuz döngüler oluşturulabilir fakat programı aksatmayacak ayrı bir işlem parçacığında çalışması gerekiyor
 //}
-//Console.WriteLine("program bitti");
 
 do
 {
-    // döngünün ilk adımında herhangi bir koşula tabi olmadan ilgili işlemler yapılır
-    // döngünün sonraki adımlarında
-} while (false); // her döngünün sonunda kontrol ettiğimiz koşul
+    // Döngünün ilk adımında herhangi bir koşula tabi olmadan ilgili işlemler yapılır
+    // Döngünün sonraki adımlarında
+} while (false); // Her döngünün sonunda kontrol ettiğimiz koşul
+
+//Console.WriteLine("Program Bitti");
 
 #endregion
 
 #region Metot ve Fonksiyonlar
 
-// [Döndürülen değerin veri tipi] [ METOTUN İSMİ ] ( [PARAMETRELER] )
+// [Döndürülen değerin veri tipi] [METOTUN İSMİ] ( [PARAMETERLER] ) { }
+
 void yazdir(string icerik)
 {
-    //int a = 0;
-    //...
-    //Console.WriteLine(icerik); //printer'a içeriği yazdıran fonksiyon olarak da düşünebiliriz
+    // ...
+    //Console.WriteLine(icerik); // Printer'a içeriği yazdıran fonksiyon olarak da düşünebiliriz.
 }
-int Topla(int sayi1, int sayi2 = 0) // Fonksiyon, sayi2 opsiyonel parametre
+
+// Fonksiyon
+
+int topla(
+    // Parametre tanımlama özellikleri
+    int sayi1, // Zorunlu parametre
+    int sayi2 = 0, // Opsiyonel parametre // En son olacak şekilde kullanabiliriz.
+    int sayi3 = 10
+)
 {
     int toplamaSonuc = sayi1 + sayi2;
-    //...
-    //...
-    //..
+    // ...
+    // ...
+    // ...
+    // ...
+    // ...
+
     return toplamaSonuc;
 } // Modülerlik
 
-//fonksiyonlarda overload yok, metotlarda yapılabilir
+// Fonksiyonlarda overload yok, metotlarda yapilabilir
 
-//parametre verme biçimleri
-int sonuc = Topla(10, 20);
-int sonuc2 = Topla(sayi2: 60, sayi1: 40); //Tekrar kullanılabilir //okunabilirlik
-//Console.WriteLine(sonuc);
+// Parametre verme biçimleri
+int sonuc = topla(40, 10); // Paramete pozisyon bazlı parametre geçtik
+int sonuc2 = topla(sayi3: 100, sayi1: 40); // Tekrar kullanılabilir // Okunabilirlik // Paramete isim bazlı parametre geçtik
 
-string yazdirmakIcinIcerik = sonuc.ToString();
-yazdir(sonuc.ToString()); //parametre pozisyon bazlı parametre geçtik
-yazdir(icerik: sonuc.ToString()); //parametre isim bazlı parametre geçtik
+yazdir(sonuc.ToString()); // Pozisyon bazlı parametre
 
-int hepsiniTopla(int baslangicSayisi, params int[] sayilar) //params bir çok parametre için, birden fazla sayılar var
-                                                            //params sadece 1 tane ve en son olacak şekilde kullanabilriz
+// Params
+int hepsiniTopla(
+    // Parametre tanımlama özellikleri
+    int baslangicSayisi,
+    params int[] sayilar
+) // params sadece bir tane ve en son olacak şekilde kullanabiliriz.
 {
     int toplam = baslangicSayisi;
     foreach (int sayi in sayilar)
@@ -226,324 +284,324 @@ int hepsiniTopla(int baslangicSayisi, params int[] sayilar) //params bir çok pa
     }
     return toplam;
 }
-int sonuc3 = hepsiniTopla(baslangicSayisi: 0, 40, 60, 90, 50, 20);
-//Console.WriteLine("hepsinin toplamı : " + sonuc3);
 
-/*namespace Printer //classlar bu main kod blogunun içinde kullanılamıyor. ayrı bir namespace lazım
-{
-/   class PrinterHelper //class:kapsam alanı
-    {
-        void yazdir(string icerik)//metot
-        {
-            Console.WriteLine(icerik);
-        }
-    }
-}*/
+int sonuc3 = hepsiniTopla(0, 40, 60, 90, 50, 20);
 
-//ref , out // temel/ilkel veri tipleri üzerinde kullanılır
-//ref, fonksiyona kendi içinde değişken oluşturma, referans ettiğim değişkeni kullan demiş oluyoruz.
-//out'un farkı, o değişkeni fonksiyon için tanımlamamız gerekiyor, zorunlu
-void ikiyleCarpiminiDosyaOlarakKaydet(ref int sayi, out int sayi2)
+// ref, out // temel/ilkel veri tipleri üzerinde kullanılır
+
+// ref, fonksiyona kendi içinde değişken oluşturma, referans ettiğim değişkeni kullan demiş oluyoruz.
+void ikiyleCarpımınıDosyaOlarakKaydet(ref int sayi, out int sayi2)
 {
     sayi *= 2;
-    sayi2 = 1; // fonksiyon/metot içinde ilk atama işlemini verme zorunluluğu getirir. 
+    sayi2 = 1; // out, Fonksiyon/Metot içinde ilk atama işlemini verme zorunluğuğu getirir.
 
-    // .. bu parametre değişkenini kullanarak başka işlemleri yaptığını varsayalım
-    //Console.WriteLine($"ikiyleCarpiminiDosyaOlarakKaydet scope sayi: {sayi}");
-    // $ işareti ile, string ifadenin içinde bir değişkeni kullandığımızı belirtiyoruz, onu oraya atıyor. + işelmi gibi yapmak için
+    //Console.WriteLine($"ikiyleCarpımınıDosyaOlarakKaydet scope sayi: {sayi}");
+    //.. bu parametre değişkenini kullanarak başka işlemleri yaptığını varsayalım
 }
+
 int sayi = 2;
 int sayiOut;
-ikiyleCarpiminiDosyaOlarakKaydet(ref sayi, out sayiOut);
-//Console.WriteLine("ana scope sayı: " + sayi + " sayiOut: " + sayiOut);
-//ref ile değişkenleri aynı yapılıyor
+ikiyleCarpımınıDosyaOlarakKaydet(ref sayi, out sayiOut);
 
-MathHelper mathhelper = new MathHelper(); //referans tip
-mathhelper.topla(1, 2);
+//Console.WriteLine("ana scope sayi " + sayi + " sayiOut: " + sayiOut);
 
-
-
+// Metot
+MathHelper mathHelper = new MathHelper(); // referans tip
+mathHelper.topla(1, 2);
 
 #endregion
 
 #region Diziler ve Koleksiyon
-Console.WriteLine("-------------------- Diziler ve Koleksiyon ---------");
-// Referans tip
-string[] sira = new string[5]; //içinde eğer tiplerin tutulduğu referans tip
-sira[0] = "özge";
-sira[2] = "ayşe";
-//Console.WriteLine($"sıra dizisindeki 0.indeksteki degeri : {sira[0]}");
+//Console.WriteLine("--------------- Diziler ve Koleksiyon ---------------");
+// Referans Tip
+string[] sira = new string[5]; // 5 dizinin içerisindeki SABIT yer sayısı
+sira[0] = "Muhammet";
+sira[2] = "Umut";
 
-//foreach (string siradakiKisininAdi in sira)
+//Console.WriteLine($"sıra dizisindeki 2. indeksteki değeri: {sıra[2]}");
+
+for (int index = 0; index < sira.Length; index++)
+{
+    string sıradakıKişininAdı = sira[index];
+
+    //Console.WriteLine($"sıra dizisindeki {index}. indeksteki değeri: {sıradakıKişininAdı ?? "null"}");
+}
+
+//foreach (string sıradakıKişininAdı in sıra)
 //{
-//    Console.WriteLine(siradakiKisininAdi);
+//    Console.WriteLine(sıradakıKişininAdı);
 //}
 
-//for (int index = 0; index < sira.Length; index++)
-//{
-//    string siradakiKisininAdi = sira[index];
-//    Console.WriteLine($"sıra dizisindeki {index}.indeksteki degeri : {siradakiKisininAdi ?? "null"}");
+string[] sira2 = { "Muhammet", "Umut" }; // new string[2] // Verdiğimiz başlangıç değeri kadar array oluşturacatır.
 
-//}
+string[] sira3 = new string[2] { "Muhammet", "Umut" };
 
-string[] sira2 = { "Özge", "Ayşe" };// new string[2] , verdiğimiz başlangıç değeri kadar array tutacaktır
-string[] sira3 = new string[5] { "özge", "ayşe", "a", "b", "c" };
+//sira3[2] = "Hacer"; // Error
 
-//string[] sira4 = new string[6];
-//for(int index = 0;index < sira3.Length; index++)
-//{
-//    sira4[index] = sira3[index];
-//}
-Array.Resize(ref sira3, 6); // önceki dizinin elemanlarının kopyasını alıp, ekstra 1 tane daha yer açıyor, 6 elemeanlı oldu
-sira3[5] = "hacer";
+Array.Resize(ref sira3, 3);
+sira3[2] = "Hacer";
 
-string[,] cokluSira = new string[2, 2]; // boyut arttırıldı, 0. indekste 2 tane yer var, 1. indekstede 2 tane yer var, matriks mantıığı
+string[,] cokluSira = new string[2, 2];
 cokluSira[0, 0] = "Ahmet";
 cokluSira[0, 1] = "Güven";
-cokluSira[1, 0] = "özge";
-cokluSira[1, 1] = "ayşe";
-//foreach (string siradakiKisininAdi in cokluSira)
-//{
-//    Console.WriteLine(siradakiKisininAdi);
-//}
 
-// string[ , , ] cokluSira=new string[2,2,2]; //3 boyutlu
+Array.Sort(sira);
+Array.Fill(sira, "Boş");
 
-//Array.Sort(cokluSira); //sırala
-//Array.Fill(sira, "boş"); //sabit yaptı
-//bool ahmetVarMi = sira.Contains("Ahmet"); //ahmet değeri varsa true dön
-//string siraString=string.Join(", ",sira);
+bool ahmetVarMi = sira.Contains("Ahmet");
+
+string siraString = string.Join(", ", sira);
+
 //Console.WriteLine(siraString);
 
-string sentence = "örnek bir cümle";
-//splip metotu ile boşluklardan kesim 3 elemanlı array yaptı
-string.Join(" ", sentence.Split(' ').Select(word => word.Length >= 5 ? new string(word.Reverse().ToArray()) : word)); //kelimenin uzunluğu, 5ten büyükse ters çevirip array haline getir, 5den küçükse aynı şekilde tut
+// Koleksiyon
+//Console.WriteLine("-------- Koleksionlar --------");
 
-// string.Join(" ", sentence.Split(' ').Select(word => word.Length >= 5 ? word.Reverse() : word)); //bu şekilde de olur
-
-//KOLEKSİYONLAR
-//class oluştu,üzerinde çalışacağımız veri tipi stringtir diyoruz
-Console.WriteLine("------KOLEKSİYONLARR-----");
-//Koleksiyon Sınıfı<degiskentipi> isim= new Koleksiyon Sınıfı<degıskentipi>();
-
-//List
+// List
 List<string> sira4 = new List<string>();
-//istediğimiz kadar veri ekleyebiliriz, sınır yok 
-sira4.Add("Ahmet");
-sira4.Add("Özge");
-sira4.Add("Burak");
-sira4.Remove("Burak");//sildi
-sira4[0] = "Furkan"; // eleman ekledikten sonra atayabiliyoruz
-//foreach (string siradakiIsim in sira4)
-//{
-//    Console.WriteLine(siradakiIsim);
-//}
 
-//Dictionary
-//Anahtar ve değer eşleşmesiyle bir sözlük yapısı oluşturulur
+sira4.Add("Ahmet");
+sira4.Add("Hacer");
+sira4.Add("Emir");
+
+sira4.Remove("Ahmet");
+
+sira4[0] = "Furkan";
+
+foreach (string siradakiIsim in sira4)
+{
+    //Console.WriteLine(siradakiIsim);
+}
+
+// Dictionary
+// Anahter ve Değer eşleşmesiyle bir sözlük yapısı oluşturur.
 //Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
 Dictionary<string, string> sira5 = new();
 
 sira5.Add(key: "Birinci Sıra", value: "Ahmet");
+
 //Console.WriteLine(sira5["Birinci Sıra"]);
-//foreach (KeyValuePair<string, string> siradaki in sira5)
-//{
-//    Console.WriteLine($"{siradaki.Key},{siradaki.Value}");
-//}
-//ArrayList
-//sabit bir veri tipi yok, istediğimizi verebiliriz, uzunluk da belli değil
+
+foreach (KeyValuePair<string, string> siradaki in sira5)
+{
+    //Console.WriteLine($"{siradaki.Key}, {siradaki.Value}");
+}
+
+// ArrayList
+// Eleman veri tipleri dinamiktir.
 ArrayList sira6 = new();
 
-sira6.Add("Özge");
+sira6.Add("Ahmet");
 sira6.Add(null);
 sira6.Add(15);
 sira6.Add(true);
 
-//LinkedList
+// LinkedList
 LinkedList<string> sira7 = new();
 sira7.AddFirst("Ahmet");
-//var sira7IlkKisi = sira7.First.Next.Value;
+var sira7IlkKisi = sira7.First.Value;
 
-//HashSet
-//ekleyeceğim her veri birbirinden farklıdır,benzersizdir
+// HashSet
+// İçindeki elemanların tamamen birbirinden farklı olmak durumunda.
 HashSet<string> katilimcilar = new();
 
-katilimcilar.Add("ozge@gmail.com");
-katilimcilar.Add("ahmet@gmail.com");
+katilimcilar.Add("ahmet@tobetto.com");
+katilimcilar.Add("said@tobetto.com");
 
 #endregion
 
-#region Classlar
-//referense type
-//C# Nesneye Dayalı (OOP) Programlama Dili
-//classlar nesneler oluşturmak için bir şablondur diyebiliriz
-//Student ogrenci = new Student(); //nesne // referans
-//ogrenci.FirstName = "Özge";
-//ogrenci.LastName = "Kestane";
-//Console.WriteLine(ogrenci.FullName);
+#region Class
+//Console.WriteLine("-------- Class -------");
+// Referans Tip
+// C# Nesneye Dayalı (OOP) Programlama Dili
+// Class'lar Nesneler oluşturmak için bir şablondur diyebiliriz.
+//Student ogrenci = new(); // Nesne // Referans
+//ogrenci.FirstName = "Ahmet";
+//ogrenci.LastName = "Çetinkaya"; //
 
-//Student ogrenci1 = new()
-//{
-//    FirstName = "Muhammet",
-//    LastName = "Mutlo",
-//    Yas = 25
-//};
-//Console.WriteLine($"{ ogrenci1.FirstName}-{ ogrenci1.LastName}");
+////Console.WriteLine(ogrenci.FullName);
 
+//Student ogrenci1 =
+//    new()
+//    {
+//        FirstName = "Muhammet",
+//        LastName = "Mutlo",
+//        Yas = 25
+//    };
 //Student ogrenci2 = ogrenci1;
-//ogrenci1.LastName = "Mutlu";
-//Console.WriteLine($"{ogrenci1.FirstName}-{ogrenci1.LastName}-{ogrenci1.Yas}");
-//Console.WriteLine($"{ogrenci2.FirstName}-{ogrenci2.LastName}-{ogrenci2.Yas}");
+//ogrenci2.LastName = "Mutlu";
 
-
+//Console.WriteLine($"{ogrenci1.FirstName} - {ogrenci1.LastName} {ogrenci1.Yas}");
+//Console.WriteLine($"{ogrenci2.FirstName} - {ogrenci2.LastName} {ogrenci2.Yas}");
 #endregion
 
 #region Değer ve Referans Veri Tipleri
 
-// Değer Veri Tipleri 
-//değişkenler: veriyi geçici olarak RAM da tutabildiğimiz değerlerdir
-int number1 = 10; //10 // 30
-int number2 = 20; //10 //10
+// Değer Veri Tipleri
+int number1 = 10; // 10 // 30
+int number2 = 20; // 20 // 10
 
-number2 = number1; // number2: 20 ->10
-number1 = 30; //number1: 10-> 30
-Console.WriteLine(number2); //10
+number2 = number1; // number2: 20 -> 10
 
-//Referans Veri Tipleri //array
-string[] cities1 = // 0x3271 (Hexidecimal 16'lık sayı sistemindeki sayı
-    new string[2] { "Konya", "İstanbul" }; //veri Heapdeki ayrılan yere yerleştirilir, örneğin 0x3271
-string[] cities2 = //0x5721
-    new string[2] { "Ankara", "İzmir" };
+number1 = 30; // number1: 10 -> 30
 
-Console.WriteLine(cities1.ToString()); // hangi veri tipinde döndüğünü gösteriyor
-cities2 = cities1;
+Console.WriteLine(number2); // 10
 
+// Referans Veri Tipleri
+string[] cities1 = // 0x3271 (Hexidecimal 16'lık sayı sistemindeki sayı)
+new string[2] { "Konya", "Istanbul" }; // Veri HEAP'daki ayrılan yere yerleştirilir, örneğin adresi 0x3271
+string[] cities2 = // 0x5721
+new string[2] { "Ankara", "Izmir" }; // Veri HEAP'daki ayrılan yere yerleştirilir, örneğin adresi 0x5721
 
-//cities1.CopyTo(cities2,0); //0. indeksteki veriyi cities2'ye kopyalar
+cities2 = cities1; // 0x5721 -> 0x3271
+
 //for (int i = 0; i < cities1.Length; i++)
-// cities2[i] = cities1[i]; ==> 417. satırı yoruma alıp bunu yazınca, cevap konya çıkıyor. burada bellek adresleri değişmeden sadece veri kopyalaması yapıldığı için
-// cities1.CopyTo(cities2,i);
+//    cities2[i] // 0x5721
+//        = cities1[i];
 
-cities1[0] = "Antalya";
+cities1[
+    0
+] // 0x3271
+= "Antalya";
 
-Console.WriteLine(cities2[0]); //Antalya
-//Console.WriteLine(ogrenci);
+Console.WriteLine(string.Join(", ", cities2));
 
-const int number3 = 10; // const sabit değere sahip değişken, tekrar atama yapamayız
-//Immutable
-ImmutableArray<string> cities3 = cities1.ToImmutableArray(); //referans tiptekiler için, değiştirilmez
-//cities3[0] = "Konya"; olmuyor
+// String veri tipi
+const int number3 = 10; // Sabit değere sahip değişken
 
-//string veri tipi
+//number3 = 11;
 
-string city1 = "Konya"; //0x4242
-string city2 = "Ankara"; //0x0606
-city2 = city1; //0x0606 -> 0x4242
-#region Temsili Arka Plan
+// Immutable
+ImmutableArray<string> cities3 = cities1.ToImmutableArray();
 
-//Temsili Arka Plan
-//ImmutableArray<char>SetString(ImmutableArray<char>city1Array())
-//ImmutableArray<char> city1ArrayToAntalya = ImmutableArray.Create('a', 'n', 't', 'a', 'l', 'y', 'a'); //char[7]
-//Array.Resize(ref city1Array, 7);
-//for (int i = 0; i < city1Array.Length; i++)
-//{
-//    city1Array[i] = city1ArrayToAntalya[i];
-//city1Array = city1ArrayToAntalya;
+//cities3[0] = "Konya";
 
-//}
-#endregion
-city1 = "Antalya"; //0x4242 -> 0x0707
-city1 += "Güzeldir"; //0x0707 -> 0x0807 // boyutu büyüdüğü için
+string city1 = "Konya"; // 0x4242
+string city2 = "Ankara"; // 0x0606
 
-Console.WriteLine(city2);//Konya
+city2 = city1; // 0x0606 -> 0x4242
+#region Temsili arka plan
+ImmutableArray<char> setString(
+    ImmutableArray<char> city1Array // 0x4242
+)
+{
+    ImmutableArray<char> city1ArrayToAntalya = // 0x0707
+    ImmutableArray.Create('A', 'n', 't', 'a', 'l', 'y', 'a'); // char[7]
 
-//StringBuilder
-StringBuilder stringBuilder = new StringBuilder(); //0x9284 // Allocation //daha performanslı
-stringBuilder.Append("Antalya"); //0x9284
-stringBuilder.Append("Güzeldir"); //0x9284 No Allocation
+    //Array.Resize(ref city1Array, 7);
+    //for (int i = 0; i < city1Array.Length; i++)
+    //{
+    //    city1Array[i] = city1ArrayToAntalya[i];
+    //}
 
-Console.WriteLine(stringBuilder.ToString()); // 0x7292 //Allocation // Stringe çevirdiği için yeni bir adres oluşturuyor
-
-
-
+    return city1ArrayToAntalya; // 0x0707
+}
 #endregion
 
-#region Nesneye Yönelimli Programlama (OOP) 
+
+city1 = "Antalya"; // 0x4242 -> 0x0707
+city1 += " Güzeldir"; // 0x0707 -> 0x0807
+
+Console.WriteLine(city2); // Konya
+
+// StringBuilder
+StringBuilder stringBuilder = new(); // 0x9284 // Allocation
+stringBuilder.Append("Antalya"); // 0x9284
+stringBuilder.Append(" Güzeldir"); // 0x9284
+
+Console.WriteLine(
+    stringBuilder.ToString() // 0x7292 // Allocation
+);
+
+#endregion
+
+
+#region Nesneye Yönemli Programlama (OOP)
 /*
- * Sınıflar ve Nesneler: Yazılım, gerçek dünyadaki ve iş sürecindeki nesnelerin özelliklerinin tanımı ve davranışlarını içeren sınıflardır, ve sınıflarla üretilen nesnelerle oluşur 
- * 
- * Kapsülleme (Encapsulation):Veriyi, davranışları,özellikleri (property) arada tutmak ve bunlara olan dışarıdan erişimini kontrol etmemiz
- * 
- * Kalıtım (Inheritance); Sınıflar arasında bir "parent-child" ilişkisi kurulması ve aynı zamanda "is a" ilişkisi kurulması, bir sınıfın özellikleri ve davranışları diğer sınıfa miras olarak geçirebilmesi. Böylece yazılımın bazı parçaları tekrar kullanılabikir. 
- * yazdığımız her classın içinde default olarak Object kalıtımı geliyor. 
- * class Ogrenci: Object
- * 
- * Çok Biçimlilik (Polymorphism): Aynı isimdeki davranışların farklı sınıflarda farklı şekillerde davranabilmesini sağlar. Bu da yazılımın esnekliğini arttırır. Base Classlar, child classların referansını tutabiliyorlar
- * 
- * Soyutlama (Abstraction): KArmaşık sistemleri basitleştirmek için ortak özellikleri belirleyerek soyutlama yapılır. 
- * Fakat soyutlamalar üzerinden somut bir veri oluşturulmaz.
- * Ogrenci is a human
+ * Sınıflar ve Nesneler: Yazılım, gerçek dünyadaki ve iş sürecindeki nesnelerin özelliklerinin tanımı ve davranışlarının tanımını
+ * içeren sınıflardır, ve sınıflarla üretilen nesnelerle oluşur.
+ *
+ * Kapsülleme (Encapsulation): özellikleri, davranışları bir arada tutmak ve bunlara olan dışardan erişimini kontrol edebilmemiz
+ *
+ * Katılım (Inheritance): Sınıflar arasında bir "parent-child" ve aynı zamanda is-a ilişkisi kurulması,
+ * bir sınıfın özellikleri ve davranışlarını diğer sınıfa miras olarak geçebilmesi.
+ * Böylece yazılımın bazı parçaları tekrar kullanılabilir.
+ *
+ * Çok Biçimlilik (Polymorphism): Aynı isimdeki davranışların farklı sınıflarda farklı şekilerde davranabilemsini sağlar,
+ * bu da yazılımında esnekliğini artırır. Ek olarak Base Class'lar Child class'ların referanslarını tutabiliyorlar.
+ *
+ * Soyutlama (Abstraction): Karmaşık sistemleri basitleştirmek için ortak özellikleri belirleyerek gerçek hayatta da olduğu gibi
+ * soyutlama yapılır.
  */
 
-int lastId = 0;
+//Entity entity = new Entity();
 
-User user = new User(/*id: ++lastId,*/ firstName: "Hacer Sema", lastName: "Aktaş", nickName: "Hacer.Aktas", email: "hacer@exp.com", password: "123456");
-User user1 = new User(firstName: "Hacer Sema", lastName: "Aktaş", nickName: "Hacer.Aktas", email: "hacer@exp.com", password: "123456");
-
+User user = new User(
+    firstName: "Hacer Sema",
+    lastName: "Aktaş",
+    nickName: "Hacer.Aktas",
+    email: "hacer@example.com",
+    password: "123456"
+);
+Entity user1 = new User(
+    firstName: "Hacer Sema",
+    lastName: "Aktaş",
+    nickName: "Hacer.Aktas",
+    email: "hacer@example.com",
+    password: "123456"
+);
 
 Console.WriteLine(user.Id);
 Console.WriteLine(user1.Id);
 
-// user.CreatedAt= DateTime.Now; //set'i kaldırdığımız için bu kodda kızıyor
-Console.WriteLine("-----------");
-Student student = new(id: ++lastId, firstName: "Özge", lastName: "Kestane", nickName: "ozgkestane", email: "ozge@exp.com", password: "1234", phoneNumber: "123456", yas: 25);
-Entity student1 = new Student(id: ++lastId, firstName: "Özge", lastName: "Kestane", nickName: "ozgkestane", email: "ozge@exp.com", password: "1234", phoneNumber: "123456", yas: 25);
+Console.WriteLine("-------");
+int lastId = 0;
 
-Console.WriteLine(student);
-Console.WriteLine(((Student)student1).PhoneNumber); //entitty olarak oluşturduğumuzda phone numberı görmüyordu, şuan bunu bir student olarak gör dedik
-student1.UpdatedAt = DateTime.Now;
-Console.WriteLine($"Student: {((Student)student1).PhoneNumber}");
-
-Console.WriteLine("-----------");
-
-
-Instructor instructor = new
-    (id: ++lastId,
-    firstName: "Ahmet",
-    lastName: "Çetinkaya",
-    nickName: "a.cetinkaya",
-    email: "ahmet@exp.com",
-    password: "123456",
-    field: "software"
+Student student =
+    new Student(
+        id: ++lastId,
+        firstName: "Emir",
+        lastName: "Karameke",
+        nickName: "emir.karameke",
+        email: "emir@outlook.com",
+        password: "123456",
+        phoneNumer: "123456",
+        yas: 25
     );
-//get'i kaldırınca erişilmiyor
-//Console.WriteLine(instructor.Password);
+
+Console.WriteLine("-------");
+
+Instructor instructor =
+    new(
+        id: ++lastId,
+        firstName: "Ahmet",
+        lastName: "Çetinkaya",
+        nickName: "ahmet.cetinkaya",
+        email: "ahmet@outlook.com",
+        password: "123456",
+        field: "Software"
+    );
 
 instructor.Password = "654321";
-//Console.WriteLine(instructor.Password);
 
-//EntityRepository entityRepository = new EntityRepository();
+Console.WriteLine("-------");
+//EntityRepository entityRepository = new();
+
 //entityRepository.UpdateEntity(user);
 //entityRepository.UpdateEntity(student);
 //entityRepository.UpdateEntity(instructor);
 
-IUserDal userDal = new SqlDbUserDal(); //new InMemoryUserDal();
+IUserDal userDal = new SqlDbUserDal();  //new InMemoryUserDal();
 // Dependency Injection // IoC
 
-
-userDal.Add(user);
-
+userDal.Add( user );
 #endregion
 
-//Configuration.cs
+// Configuration.cs
 //IBrandDal brandDal = new InMemoryBrandDal();
-//BrandBusinessRules brandBusinessRules = new BrandBusinessRules(brandDal);
-//IBrandService brandService = new BrandManager(brandDal, brandBusinessRules);
-////Configuration.cs
+//IBrandService brandService = new BrandManager(brandDal);
+// Configuration.cs
 
-
-
-//// >RentACar add brand BMW
-
+// > RentACar add brand BMW
 //Brand brandToAdd = new Brand { Name = "BMW" };
 //brandService.Add(brandToAdd);

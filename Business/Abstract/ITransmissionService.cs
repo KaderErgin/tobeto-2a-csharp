@@ -1,10 +1,15 @@
-﻿using Business.Request.Transmission;
+﻿
+using Business.Requests.Transmission;
 using Business.Responses.Transmission;
-namespace Business.Abstract;
 
-public interface ITransmissionService
+namespace Business.Abstract
 {
-    public AddTransmissionResponse Add(AddTransmissionRequest request);
-    public GetTransmissionListResponse GetList(GetTransmissionListRequest request);
+    public interface ITransmissionService
+    {
+        public AddTransmissionResponse Add(AddTransmissionRequest request);
+        public UpdateTransmissionResponse Update(UpdateTransmissionRequest request);
+        public DeleteTransmissionResponse Delete(DeleteTransmissionRequest request);
+        public GetTransmissionListResponse GetList(GetTransmissionListRequest request);
 
+    }
 }

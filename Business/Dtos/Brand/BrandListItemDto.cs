@@ -1,8 +1,7 @@
-﻿namespace Business.Dtos.Brand
+﻿namespace Business.Dtos.Brand;
+
+public class BrandListItemDto 
 {
-    public class BrandListItemDto 
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
+    public int Id { get; set; }
+    public string Name { get; set; }
 }

@@ -9,7 +9,13 @@
         {
             Id = id;
             Name = name;
+
             CreatedAt = createdAt;
+
+        }
+        public AddTransmissionResponse()
+        {
+
         }
     }
 }

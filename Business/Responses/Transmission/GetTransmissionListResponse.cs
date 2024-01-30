@@ -1,6 +1,6 @@
 ﻿using Business.Dtos.Transmission;
 
-namespace Business
+namespace Business.Responses.Transmission
 {
     public class GetTransmissionListResponse
     {

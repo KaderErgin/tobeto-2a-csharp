@@ -1,42 +1,58 @@
 ﻿using Business;
 using Business.Abstract;
-using Business.Request.Brand;
+using Business.Concrete;
+using Business.Requests.Brand;
 using Business.Responses.Brand;
+using DataAccess.Abstract;
+using DataAccess.Concrete.InMemory;
+using Entities.Concrete;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace WebAPI.Controllers
+namespace WebAPI.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class BrandsController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class BrandsController : ControllerBase
+    private readonly IBrandService _brandService; 
+
+    public BrandsController(IBrandService brandService)
+    {    
+        _brandService = brandService;
+    }
+
+   
+    [HttpGet] // GET http://localhost:5245/api/brands
+    public GetBrandListResponse GetList([FromQuery] GetBrandListRequest request) 
     {
-        private readonly IBrandService _brandService;//Field
-        public BrandsController(IBrandService brandService)
+        GetBrandListResponse response = _brandService.GetList(request);
+        return response; // JSON
+    }
+
+    //[HttpPost("/add")] // POST http://localhost:5245/api/brands/add
+    [HttpPost] // POST http://localhost:5245/api/brands
+    public ActionResult<AddBrandResponse> Add(AddBrandRequest request)
+    {
+        try
         {
-            // Her HTTP Request için yeni bir Controller nesnesini oluşturulur.
-            _brandService = brandService;
+            AddBrandResponse response = _brandService.Add(request);
+
+            //return response; // 200 OK
+            return CreatedAtAction(nameof(GetList), response); // 201 Created
         }
-
-        [HttpGet]
-        public GetBrandListResponse GetList([FromQuery] GetBrandListRequest request)// Referans tipleri varsayılan request body'den alır.
+        catch (Core.CrossCuttingConcerns.Exceptions.BusinessException exception)
         {
-            GetBrandListResponse response = _brandService.GetList(request);
-            return response; //JSON
-        }
-
-        //[HttpPost("/add")]// http://localhost:5031/api/brands/add
-        [HttpPost] //POST http://localhost:5031/api/brands
-        public ActionResult<AddBrandResponse> Add(AddBrandRequest request)
-        {
-           
-            {
-
-                AddBrandResponse response = _brandService.Add(request);
-                //return response; // 200 OK
-
-                return CreatedAtAction(nameof(GetList), response); // 201 Created 
-            }
-         
+            return BadRequest(
+                new Core.CrossCuttingConcerns.Exceptions.BusinessProblemDetails()
+                {
+                    Title = "Business Exception",
+                    Status = StatusCodes.Status400BadRequest,
+                    Detail = exception.Message,
+                    Instance = HttpContext.Request.Path
+                }
+            );
+            // 400 Bad Request
         }
     }
 }

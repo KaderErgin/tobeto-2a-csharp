@@ -1,20 +1,11 @@
-﻿namespace Business.Request.Model
-{
-    public class AddModelRequest
-    {
-        public int BrandId { get; set; }
-        public int FuelId { get; set; }
-        public int TransmissionId { get; set; }
-        public string Name { get; set; }
-        public decimal DailyPrice { get; set; }
+﻿namespace Business.Requests.Model;
 
-        public AddModelRequest(int brandId, int fuelId, int transmissionId, string name, decimal dailyPrice)
-        {
-            BrandId = brandId;
-            FuelId = fuelId;
-            TransmissionId = transmissionId;
-            Name = name;
-            DailyPrice = dailyPrice;
-        }
-    }
+public class AddModelRequest
+{
+    public int BrandId { get; set; }
+    public int FuelId { get; set; }
+    public int TransmissionId { get; set; }
+    public string Name { get; set; }
+    public short Year { get; set; }
+    public decimal DailyPrice { get; set; }
 }

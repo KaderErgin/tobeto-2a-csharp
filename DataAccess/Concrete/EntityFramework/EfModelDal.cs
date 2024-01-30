@@ -1,41 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using DataAccess.Abstract;
+﻿using DataAccess.Abstract;
+using DataAccess.Concrete.EntityFramework.Contexts;
 using Entities.Concrete;
 
-namespace DataAccess.Concrete.EntityFramework
+namespace DataAccess.Concrete.EntityFramework;
+
+public class EfModelDal : IModelDal
 {
-    public class EfModelDal : IModelDal
+    private readonly RentACarContext _context;
+
+    public EfModelDal(RentACarContext context)
     {
-        public void Add(Model entity)
-        {
-            throw new NotImplementedException();
-        }
+        _context = context;
+    }
 
-        public void Delete(Model entity)
-        {
-            throw new NotImplementedException();
-        }
+    public Model Add(Model entity)
+    {
+        entity.CreatedAt = DateTime.UtcNow;
+        _context.Models.Add(entity);
 
-        public IList<Model> GetModelsByNameSearch(string nameSearch)
-        {
-            throw new NotImplementedException();
-        }
+        _context.SaveChanges(); 
+        return entity;
+    }
 
-        public Model? GetById(int id)
-        {
-            throw new NotImplementedException();
-        }
+    public Model Delete(Model entity, bool isSoftDelete = true)
+    {
+        entity.DeletedAt = DateTime.UtcNow;
 
-        public IList<Model> GetList()
-        {
-            throw new NotImplementedException();
-        }
+        if (!isSoftDelete)
+            _context.Models.Remove(entity);
 
-        public void Update(Model entity)
-        {
-            throw new NotImplementedException();
-        }
+        _context.SaveChanges();
+        return entity;
+    }
+
+    public Model? Get(Func<Model, bool> predicate)
+    {
+        Model? model = _context.Models.FirstOrDefault(predicate); 
+        return model;
+    }
+
+    public IList<Model> GetList(Func<Model, bool>? predicate = null)
+    {
+        IQueryable<Model> query = _context.Set<Model>();
+        if (predicate != null)
+            query = query.Where(predicate).AsQueryable();
+
+        return query.ToList(); 
+    }
+
+    public Model Update(Model entity)
+    {
+        entity.UpdateAt = DateTime.UtcNow;
+        _context.Models.Update(entity);
+
+        _context.SaveChanges();
+        return entity;
     }
 }

@@ -23,48 +23,48 @@ public static class ServiceCollectionBusinessExtension
     )
     {
         services//Brand
-            .AddSingleton<IBrandService, BrandManager>()
-            .AddSingleton<IBrandDal, InMemoryBrandDal>()
-            .AddSingleton<BrandBusinessRules>();
+            .AddScoped<IBrandService, BrandManager>()
+            .AddScoped<IBrandDal, EfBrandDal>()
+            .AddScoped<BrandBusinessRules>();
         // Fluent
         // Singleton: Tek bir nesne oluşturur ve herkese onu verir.
         // Ek ödev diğer yöntemleri araştırınız.
 
         services//Fuel
-           .AddSingleton<IFuelService, FuelManager>()
-           .AddSingleton<IFuelDal, InMemoryFuelDal>()
-           .AddSingleton<FuelBusinessRules>();
+           .AddScoped<IFuelService, FuelManager>()
+           .AddScoped<IFuelDal, EfFuelDal>()
+           .AddScoped<FuelBusinessRules>();
     
         services//Transmission
-          .AddSingleton<ITransmissionService,TransmissionManager>()
-          .AddSingleton<ITransmissionDal, InMemoryTransmissionDal>()
-          .AddSingleton<TransmissionBusinessRules>();
+          .AddScoped<ITransmissionService,TransmissionManager>()
+          .AddScoped<ITransmissionDal, EfTransmissionDal>()
+          .AddScoped<TransmissionBusinessRules>();
 
         services//Car
-          .AddSingleton<ICarService, CarManager>()
-          .AddSingleton<ICarDal, InMemoryCarDal>()
-          .AddSingleton<CarBusinessRules>();
+          .AddScoped<ICarService, CarManager>()
+          .AddScoped<ICarDal, EfCarDal>()
+          .AddScoped<CarBusinessRules>();
 
         services//Users
-         .AddSingleton<IUsersService, UsersManager>()
-         .AddSingleton<IUsersDal, InMemoryUsersDal>()
-         .AddSingleton<UsersBusinessRules>();
+         .AddScoped<IUsersService, UsersManager>()
+         .AddScoped<IUsersDal, EfUsersDal>()
+         .AddScoped<UsersBusinessRules>();
 
         services//Customers
-        .AddSingleton<ICustomersService, CustomersManager>()
-        .AddSingleton<ICustomersDal, InMemoryCustomersDal>()
-        .AddSingleton<CustomersBusinessRules>();
+        .AddScoped<ICustomersService, CustomersManager>()
+        .AddScoped<ICustomersDal, EfCustomersDal>()
+        .AddScoped<CustomersBusinessRules>();
 
         services//IndividualCustomer
-        .AddSingleton<IIndividualCustomerService, IndividualCustomerManager>()
-        .AddSingleton<IIndividualCustomerDal, InMemoryIndividualCustomerDal>()
-        .AddSingleton<IndividualCustomerBusinessRules>();
+        .AddScoped<IIndividualCustomerService, IndividualCustomerManager>()
+        .AddScoped<IIndividualCustomerDal, EfIndividualCustomerDal>()
+        .AddScoped<IndividualCustomerBusinessRules>();
 
 
         services//CorporateCustomer
-        .AddSingleton<ICorporateCustomerService, CorporateCustomerManager>()
-        .AddSingleton<ICorporateCustomerDal, InMemoryCorporateCustomerDal>()
-        .AddSingleton<CorporateCustomerBusinessRules>();
+        .AddScoped<ICorporateCustomerService, CorporateCustomerManager>()
+        .AddScoped<ICorporateCustomerDal, EfCorporateCustomerDal>()
+        .AddScoped<CorporateCustomerBusinessRules>();
 
         services//Model  EfModelDal sınıfından alsın
             .AddScoped<IModelService, ModelManager>()
